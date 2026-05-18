@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap IT 2025–2027</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #1a2b5e;
+    --navy2:   #243570;
+    --blue:    #3b82f6;
+    --green:   #10b981;
+    --red:     #ef4444;
+    --amber:   #f59e0b;
+    --purple:  #8b5cf6;
+    --gray:    #94a3b8;
+    --bg:      #f8fafc;
+    --surface: #ffffff;
+    --border:  #e2e8f0;
+    --text:    #1e293b;
+    --muted:   #64748b;
+    --faint:   #f1f5f9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    background: var(--navy);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left h1 { font-size: 20px; font-weight: 600; color: #fff; letter-spacing: -.3px; }
+  .header-left p  { font-size: 12px; color: #93c5fd; margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+  .kpi-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .kpi {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 72px;
+  }
+  .kpi-val { font-size: 22px; font-weight: 600; color: #fff; }
+  .kpi-lbl { font-size: 10px; color: #93c5fd; margin-top: 1px; text-transform: uppercase; letter-spacing: .06em; }
+  .kpi-val.green  { color: #6ee7b7; }
+  .kpi-val.blue   { color: #93c5fd; }
+  .kpi-val.red    { color: #fca5a5; }
+  .kpi-val.gray   { color: #cbd5e1; }
+
+  .toolbar {
+    padding: 14px 32px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .toolbar-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-right: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .fbtn {
+    font-size: 12px; padding: 5px 14px; border-radius: 999px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+  }
+  .fbtn:hover { background: var(--faint); color: var(--text); }
+  .fbtn.active { background: var(--navy); color: #fff; border-color: var(--navy); font-weight: 500; }
+
+  .gantt-wrapper {
+    padding: 0 32px 32px;
+    overflow-x: auto;
+  }
+
+  /* Fixed-layout table: left cols fixed width, bar col fills remaining */
+  .gantt-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  /* Column widths */
+  .col-name   { width: 220px; }
+  .col-area   { width: 72px;  }
+  .col-status { width: 88px;  }
+  .col-who    { width: 80px;  }
+  .col-bar    { /* fills rest */ }
+
+  .gantt-table thead tr.header-labels th {
+    padding: 14px 8px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--muted);
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .gantt-table thead tr.header-labels th.col-bar { padding-bottom: 0; }
+
+  /* Quarter labels row */
+  .q-labels { position: relative; height: 22px; }
+  .q-label {
+    position: absolute;
+    top: 2px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+  /* Month tick marks */
+  .q-ticks { position: relative; height: 10px; }
+  .q-tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: var(--border);
+  }
+  .q-tick.major { background: #cbd5e1; height: 100%; }
+
+  /* Data rows */
+  .gantt-table tbody tr {
+    transition: background .1s;
+  }
+  .gantt-table tbody tr:hover { background: #f8fafc; }
+  .gantt-table tbody td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+  }
+  .proj-name {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 210px;
+    display: block;
+  }
+  .tag {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 999px; display: inline-block; white-space: nowrap;
+  }
+  .tag-dev { background: #dbeafe; color: #1e40af; }
+  .tag-sis { background: #d1fae5; color: #065f46; }
+  .tag-neg { background: #ede9fe; color: #4c1d95; }
+
+  .status-pill {
+    font-size: 10px; font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .avs { display: flex; gap: 2px; flex-wrap: nowrap; }
+  .av  {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 600; flex-shrink: 0;
+    border: 1.5px solid #fff;
+  }
+
+  /* Bar cell */
+  .bar-cell-inner { position: relative; height: 22px; }
+  .bar-bg {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 14px; background: #f1f5f9; border-radius: 3px;
+    left: 0; right: 0;
+  }
+  .bar {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 14px; border-radius: 3px;
+    transition: opacity .2s;
+  }
+  .today-line {
+    position: absolute; top: 0; bottom: 0;
+    width: 2px; background: #ef4444;
+    opacity: .9; z-index: 5;
+    border-radius: 1px;
+  }
+  .today-label {
+    position: absolute; top: -16px;
+    font-size: 9px; font-family: 'DM Mono', monospace;
+    color: #ef4444; font-weight: 500;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  /* Grid lines inside bar area */
+  .grid-line {
+    position: absolute; top: 0; bottom: 0;
+    width: 1px; background: var(--border); z-index: 1;
+  }
+  .grid-line.major { background: #cbd5e1; }
+
+  /* Legend */
+  .bottom {
+    padding: 16px 32px 24px;
+    display: flex; flex-wrap: wrap; gap: 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .legend-group { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .legend-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 4px; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Roadmap · Departamento IT</h1>
+    <p>Proyectos 2025 – 2027 &nbsp;·&nbsp; Actualizado mayo 2026</p>
+  </div>
+  <div class="kpi-row" id="kpi-row"></div>
+</header>
+
+<div class="toolbar">
+  <span class="toolbar-label">Filtrar por área</span>
+  <div id="filters"></div>
+</div>
+
+<div class="gantt-wrapper">
+  <table class="gantt-table" id="gantt"></table>
+</div>
+
+<div class="bottom">
+  <div class="legend-group">
+    <span class="legend-title">Estado</span>
+    <span class="leg"><span class="leg-dot" style="background:#10b981"></span>Completado</span>
+    <span class="leg"><span class="leg-dot" style="background:#3b82f6"></span>En curso</span>
+    <span class="leg"><span class="leg-dot" style="background:#ef4444"></span>Retrasado</span>
+    <span class="leg"><span class="leg-dot" style="background:#94a3b8"></span>No iniciado</span>
+    <span class="leg"><span class="leg-dot" style="background:#8b5cf6"></span>Cancelado</span>
+  </div>
+  <div class="legend-group" id="av-legend">
+    <span class="legend-title">Equipo</span>
+  </div>
+</div>
+
+<script>
+const PEOPLE = {
+  JM: { name: "Jose Mosq.",  bg: "#dbeafe", c: "#1e40af" },
+  EL: { name: "Eneko Liza.", bg: "#d1fae5", c: "#065f46" },
+  MT: { name: "MT",          bg: "#ede9fe", c: "#4c1d95" },
+  RS: { name: "Ruben Seij.", bg: "#fef3c7", c: "#92400e" },
+  FR: { name: "FR",          bg: "#ffe4e6", c: "#9f1239" },
+  EF: { name: "Eduardo F.",  bg: "#f3e8ff", c: "#6b21a8" },
+};
+
+const PROJECTS = [
+  { n:"Migrar OpenVPN a Forticlient",         s:"2025-12-31", e:"2026-02-11", st:"En curso",    area:"Sistemas", ret:true,  who:["JM"] },
+  { n:"Cambio contraseñas dominio",            s:"2026-02-02", e:"2026-06-30", st:"Completado",  area:"Sistemas",           who:["JM"] },
+  { n:"Odoo AMI Transformaciones",             s:"2026-01-31", e:"2026-01-31", st:"Cancelado",   area:"Dev",                who:["EL"] },
+  { n:"API Odoo-Delagros Taller Chantada",     s:"2026-02-01", e:"2026-05-31", st:"En curso",    area:"Dev",                who:["EL","RS"] },
+  { n:"Implementar QUK en Melide",             s:"2026-01-31", e:"2026-02-28", st:"En curso",    area:"Dev",    ret:true,   who:["EL","MT"] },
+  { n:"Odoo Chantada v1 (pantallas op.)",      s:"2026-02-28", e:"2026-03-31", st:"Completado",  area:"Dev",                who:["EL"] },
+  { n:"Chantada v2 Plantillas CheckList",      s:"2026-05-31", e:"2026-06-30", st:"No iniciado", area:"Dev",                who:["EL"] },
+  { n:"Documento Requerimientos AMI",          s:"2026-03-15", e:"2026-06-30", st:"En curso",    area:"Dev",                who:["EL"] },
+  { n:"Actualizar Zabbix versión",             s:"2026-07-01", e:"2026-09-30", st:"No iniciado", area:"Sistemas",           who:["JM"] },
+  { n:"Actualización servidores Win Server",   s:"2026-01-01", e:"2026-12-31", st:"No iniciado", area:"Sistemas",           who:["FR","MT","JM"] },
+  { n:"Actualizar JIRA versión",               s:"2026-01-10", e:"2026-10-31", st:"No iniciado", area:"Sistemas",           who:["JM"] },
+  { n:"Preparación NIS2",                      s:"2026-03-03", e:"2026-12-31", st:"En curso",    area:"Negocio",            who:["MT","JM"] },
+  { n:"Pruebas Desarrollo Odoo 18",            s:"2026-10-18", e:"2026-10-31", st:"No iniciado", area:"Dev",                who:["FR","EL"] },
+  { n:"Cambio a Windows 11 (58 equipos)",      s:"2026-03-03", e:"2027-01-31", st:"En curso",    area:"Sistemas",           who:["FR"] },
+  { n:"Eliminar dominio lasurgal",             s:"2026-01-01", e:"2027-05-31", st:"No iniciado", area:"Sistemas",           who:["FR","JM"] },
+  { n:"Cambio VLANs y red toda Aira",          s:"2026-05-08", e:"2026-08-31", st:"No iniciado", area:"Sistemas",           who:["FR","MT","JM"] },
+  { n:"Pruebas implantación Odoo 18",          s:"2026-11-30", e:"2026-12-31", st:"No iniciado", area:"Dev",                who:["FR","EL"] },
+  { n:"MaquinAira",                            s:"2025-03-19", e:"2026-12-31", st:"En curso",    area:"Dev",                who:["EF","MT","JM"] },
+  { n:"Plataforma Eventos primera fase",       s:"2026-05-11", e:"2026-05-25", st:"En curso",    area:"Dev",                who:["MT","RS"] },
+  { n:"Visitas zoosanitarias",                 s:"2025-09-26", e:"2026-04-30", st:"En curso",    area:"Dev",    ret:true,   who:["RS"] },
+  { n:"Supervisión Gescarro CETIM",            s:"2025-03-05", e:"2026-06-30", st:"En curso",    area:"Dev",                who:["MT","RS"] },
+  { n:"Aleitar",                               s:"2025-11-28", e:"2026-09-21", st:"En curso",    area:"Dev",                who:["RS"] },
+  { n:"Módulo mantenimiento Maquinaria",       s:"2026-03-11", e:"2026-09-01", st:"En curso",    area:"Dev",                who:["EF"] },
+  { n:"CGAN actualización plataforma/precios", s:"2026-04-22", e:"2026-05-08", st:"Completado",  area:"Dev",                who:["RS"] },
+];
+
+const STATE_COLOR = {
+  "Completado":  "#10b981",
+  "En curso":    "#3b82f6",
+  "No iniciado": "#94a3b8",
+  "Cancelado":   "#8b5cf6",
+};
+const RET_COLOR = "#ef4444";
+
+const START  = new Date("2025-01-01");
+const END    = new Date("2027-07-01");
+const TODAY  = new Date("2026-05-18");
+const TOTAL  = END - START;
+
+function pct(dateStr) {
+  return Math.max(0, Math.min(100, (new Date(dateStr) - START) / TOTAL * 100));
+}
+function barColor(p) { return p.ret ? RET_COLOR : (STATE_COLOR[p.st] || "#94a3b8"); }
+function statusLabel(p) { return p.ret ? "Retrasado" : p.st; }
+
+const todayPct = (TODAY - START) / TOTAL * 100;
+
+// Build quarter + month markers
+function buildMarkers() {
+  const quarters = [], months = [];
+  let d = new Date(START);
+  while (d <= END) {
+    const p = (d - START) / TOTAL * 100;
+    const isQ = d.getMonth() % 3 === 0;
+    if (isQ) {
+      quarters.push({ p, label: `Q${Math.floor(d.getMonth()/3)+1} ${d.getFullYear()}` });
+    }
+    months.push({ p, major: isQ });
+    d = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+  }
+  return { quarters, months };
+}
+
+let activeFilter = "Todos";
+
+function render() {
+  const projects = activeFilter === "Todos" ? PROJECTS : PROJECTS.filter(p => p.area === activeFilter);
+
+  // KPIs
+  const comp  = PROJECTS.filter(p => p.st === "Completado").length;
+  const curso = PROJECTS.filter(p => p.st === "En curso" && !p.ret).length;
+  const ret   = PROJECTS.filter(p => p.ret).length;
+  const noi   = PROJECTS.filter(p => p.st === "No iniciado").length;
+  document.getElementById("kpi-row").innerHTML = `
+    <div class="kpi"><div class="kpi-val">${PROJECTS.length}</div><div class="kpi-lbl">Total</div></div>
+    <div class="kpi"><div class="kpi-val green">${comp}</div><div class="kpi-lbl">Completados</div></div>
+    <div class="kpi"><div class="kpi-val blue">${curso}</div><div class="kpi-lbl">En curso</div></div>
+    <div class="kpi"><div class="kpi-val red">${ret}</div><div class="kpi-lbl">Retrasados</div></div>
+    <div class="kpi"><div class="kpi-val gray">${noi}</div><div class="kpi-lbl">No iniciados</div></div>
+  `;
+
+  // Filters
+  const areas = ["Todos","Dev","Sistemas","Negocio"];
+  document.getElementById("filters").innerHTML = areas.map(a => {
+    const cnt = a === "Todos" ? PROJECTS.length : PROJECTS.filter(p => p.area === a).length;
+    return `<button class="fbtn${activeFilter===a?" active":""}" onclick="setFilter('${a}')">${a} <span style="opacity:.6;font-size:10px">${cnt}</span></button>`;
+  }).join("");
+
+  // Markers
+  const { quarters, months } = buildMarkers();
+
+  const qLabelsHTML = quarters.map(q =>
+    `<div style="position:absolute;left:${q.p.toFixed(2)}%;transform:translateX(-50%);font-size:10px;font-family:'DM Mono',monospace;color:#64748b;white-space:nowrap">${q.label}</div>`
+  ).join("");
+
+  const gridLinesHTML = months.map(m =>
+    `<div style="position:absolute;left:${m.p.toFixed(2)}%;top:0;bottom:0;width:1px;background:${m.major?'#cbd5e1':'#e2e8f0'};z-index:1"></div>`
+  ).join("");
+
+  const todayLabelOffset = todayPct.toFixed(2);
+
+  // Table
+  const table = document.getElementById("gantt");
+  table.innerHTML = `
+    <colgroup>
+      <col class="col-name">
+      <col class="col-area">
+      <col class="col-status">
+      <col class="col-who">
+      <col class="col-bar">
+    </colgroup>
+    <thead>
+      <tr class="header-labels">
+        <th class="col-name">Proyecto</th>
+        <th class="col-area">Área</th>
+        <th class="col-status">Estado</th>
+        <th class="col-who">Asignado</th>
+        <th class="col-bar" style="padding:10px 8px 0">
+          <div style="position:relative;height:20px;margin-bottom:2px">${qLabelsHTML}</div>
+          <div style="position:relative;height:8px;background:#f8fafc;border-radius:2px;overflow:visible;margin-bottom:4px">${months.map(m=>`<div style="position:absolute;left:${m.p.toFixed(2)}%;top:0;bottom:0;width:1px;background:${m.major?'#94a3b8':'#e2e8f0'}"></div>`).join("")}</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      ${projects.map((p, i) => {
+        const l = pct(p.s), r = pct(p.e);
+        const w = Math.max(0.5, r - l);
+        const c = barColor(p);
+        const op = p.st === "No iniciado" ? 0.45 : 1;
+        const tc = p.area === "Dev" ? "tag-dev" : p.area === "Sistemas" ? "tag-sis" : "tag-neg";
+        const sc = p.ret ? RET_COLOR : (STATE_COLOR[p.st] || "#94a3b8");
+        const avs = (p.who || []).map(k => {
+          const pe = PEOPLE[k] || { bg:"#e2e8f0", c:"#334155" };
+          return `<span class="av" style="background:${pe.bg};color:${pe.c}" title="${(PEOPLE[k]||{}).name||k}">${k}</span>`;
+        }).join("");
+        const showToday = i === 0;
+        return `
+          <tr>
+            <td><span class="proj-name" title="${p.n}">${p.n}</span></td>
+            <td><span class="tag ${tc}">${p.area}</span></td>
+            <td><span class="status-pill" style="color:${sc}">${statusLabel(p)}</span></td>
+            <td><div class="avs">${avs}</div></td>
+            <td style="padding:5px 8px">
+              <div class="bar-cell-inner">
+                ${gridLinesHTML}
+                <div class="bar-bg"></div>
+                <div class="bar" style="left:${l.toFixed(2)}%;width:${w.toFixed(2)}%;background:${c};opacity:${op}"></div>
+                <div class="today-line" style="left:${todayLabelOffset}%">
+                  ${showToday ? `<div class="today-label" style="left:0">HOY</div>` : ""}
+                </div>
+              </div>
+            </td>
+          </tr>`;
+      }).join("")}
+    </tbody>
+  `;
+
+  // Team legend
+  const avLeg = document.getElementById("av-legend");
+  avLeg.innerHTML = `<span class="legend-title">Equipo</span>` +
+    Object.entries(PEOPLE).map(([k,v]) =>
+      `<span class="leg"><span class="av" style="background:${v.bg};color:${v.c};width:20px;height:20px;font-size:8px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:600;border:1.5px solid #fff;flex-shrink:0">${k}</span>${v.name}</span>`
+    ).join("");
+}
+
+function setFilter(f) { activeFilter = f; render(); }
+render();
+</script>
+</body>
+</html>
